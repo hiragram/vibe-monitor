@@ -35,21 +35,21 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen p-8">
+    <main className="min-h-screen p-8 bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-900">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold mb-2">Vibe Monitor</h1>
-        <p className="text-gray-600 dark:text-gray-400 mb-8">
+        <h1 className="text-3xl font-bold mb-2 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Vibe Monitor</h1>
+        <p className="text-slate-600 dark:text-slate-400 mb-8">
           Monitor your GitHub repository activity in real-time
         </p>
 
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700">
-          <h2 className="text-xl font-semibold mb-4">Configure Repository</h2>
+        <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm p-6 rounded-lg border border-slate-200 dark:border-slate-700 shadow-lg">
+          <h2 className="text-xl font-semibold mb-4 text-slate-900 dark:text-slate-100">Configure Repository</h2>
           <ConfigForm onSubmit={handleConfigSubmit} />
         </div>
 
-        <div className="mt-8 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-          <h3 className="font-semibold mb-2">Getting Started</h3>
-          <ol className="list-decimal list-inside space-y-1 text-sm text-gray-700 dark:text-gray-300">
+        <div className="mt-8 p-4 bg-blue-50/80 dark:bg-blue-900/20 backdrop-blur-sm border border-blue-200 dark:border-blue-800 rounded-lg shadow-sm">
+          <h3 className="font-semibold mb-2 text-slate-900 dark:text-slate-100">Getting Started</h3>
+          <ol className="list-decimal list-inside space-y-1 text-sm text-slate-700 dark:text-slate-300">
             <li>
               Create a{" "}
               <a
@@ -61,7 +61,7 @@ export default function Home() {
                 GitHub Personal Access Token
               </a>
             </li>
-            <li>Grant <code className="bg-gray-100 dark:bg-gray-700 px-1 py-0.5 rounded">repo</code> and <code className="bg-gray-100 dark:bg-gray-700 px-1 py-0.5 rounded">workflow</code> scopes</li>
+            <li>Grant <code className="bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-slate-200 px-1 py-0.5 rounded">repo</code> and <code className="bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-slate-200 px-1 py-0.5 rounded">workflow</code> scopes</li>
             <li>Enter your repository details and token above</li>
             <li>Start monitoring!</li>
           </ol>

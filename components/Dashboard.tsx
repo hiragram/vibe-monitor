@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { GitHubPullRequest, GitHubWorkflowRun, GitHubRunner } from "@/types/github";
+import { GitHubPullRequest, GitHubWorkflowRun, GitHubRunner, GitHubJob } from "@/types/github";
 import PullRequestList from "./PullRequestList";
 import WorkflowRunList from "./WorkflowRunList";
 import RunnerList from "./RunnerList";
@@ -19,6 +19,7 @@ export default function Dashboard({ owner, repo, token, onReset }: DashboardProp
   const [pulls, setPulls] = useState<GitHubPullRequest[]>([]);
   const [runs, setRuns] = useState<GitHubWorkflowRun[]>([]);
   const [runners, setRunners] = useState<GitHubRunner[]>([]);
+  const [jobs, setJobs] = useState<GitHubJob[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [pollingInterval, setPollingInterval] = useState(30000); // 30 seconds default
@@ -27,25 +28,28 @@ export default function Dashboard({ owner, repo, token, onReset }: DashboardProp
   const fetchData = async () => {
     try {
       setError(null);
-      const [pullsRes, runsRes, runnersRes] = await Promise.all([
+      const [pullsRes, runsRes, runnersRes, jobsRes] = await Promise.all([
         fetch(`/api/github/pulls?owner=${owner}&repo=${repo}&token=${token}`),
         fetch(`/api/github/actions?owner=${owner}&repo=${repo}&token=${token}`),
         fetch(`/api/github/runners?owner=${owner}&repo=${repo}&token=${token}`),
+        fetch(`/api/github/jobs?owner=${owner}&repo=${repo}&token=${token}`),
       ]);
 
-      if (!pullsRes.ok || !runsRes.ok || !runnersRes.ok) {
+      if (!pullsRes.ok || !runsRes.ok || !runnersRes.ok || !jobsRes.ok) {
         throw new Error("Failed to fetch data");
       }
 
-      const [pullsData, runsData, runnersData] = await Promise.all([
+      const [pullsData, runsData, runnersData, jobsData] = await Promise.all([
         pullsRes.json(),
         runsRes.json(),
         runnersRes.json(),
+        jobsRes.json(),
       ]);
 
       setPulls(pullsData);
       setRuns(runsData);
       setRunners(runnersData);
+      setJobs(jobsData);
       setLastUpdated(new Date());
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
@@ -62,7 +66,7 @@ export default function Dashboard({ owner, repo, token, onReset }: DashboardProp
 
   const onlineRunners = runners.filter((r) => r.status === "online").length;
   const busyRunners = runners.filter((r) => r.busy).length;
-  const inProgressRuns = runs.filter((r) => r.status === "in_progress").length;
+  const queuedRuns = runs.filter((r) => r.status === "queued").length;
 
   return (
     <div className="min-h-screen p-6 md:p-8 bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-900">
@@ -101,21 +105,6 @@ export default function Dashboard({ owner, repo, token, onReset }: DashboardProp
 
           {/* Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-            <div className="bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl p-6 shadow-lg text-white">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-green-100 text-sm font-medium mb-1">Runners Online</p>
-                  <p className="text-4xl font-bold">{onlineRunners}</p>
-                  <p className="text-green-100 text-xs mt-1">{busyRunners} busy</p>
-                </div>
-                <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center">
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M12 5l7 7-7 7" />
-                  </svg>
-                </div>
-              </div>
-            </div>
-
             <div className="bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl p-6 shadow-lg text-white">
               <div className="flex items-center justify-between">
                 <div>
@@ -130,11 +119,26 @@ export default function Dashboard({ owner, repo, token, onReset }: DashboardProp
               </div>
             </div>
 
+            <div className="bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl p-6 shadow-lg text-white">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-green-100 text-sm font-medium mb-1">Runners Busy</p>
+                  <p className="text-4xl font-bold">{busyRunners}</p>
+                  <p className="text-green-100 text-xs mt-1">{onlineRunners} online</p>
+                </div>
+                <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M12 5l7 7-7 7" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+
             <div className="bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl p-6 shadow-lg text-white">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-purple-100 text-sm font-medium mb-1">Active Workflows</p>
-                  <p className="text-4xl font-bold">{inProgressRuns}</p>
+                  <p className="text-purple-100 text-sm font-medium mb-1">Queued Jobs</p>
+                  <p className="text-4xl font-bold">{queuedRuns}</p>
                   <p className="text-purple-100 text-xs mt-1">{runs.length} total</p>
                 </div>
                 <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center">
@@ -162,13 +166,6 @@ export default function Dashboard({ owner, repo, token, onReset }: DashboardProp
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="space-y-4">
               <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-                <span className="w-1 h-6 bg-gradient-to-b from-green-500 to-emerald-600 rounded-full"></span>
-                Runners
-              </h2>
-              <RunnerList runners={runners} />
-            </div>
-            <div className="space-y-4">
-              <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
                 <span className="w-1 h-6 bg-gradient-to-b from-blue-500 to-indigo-600 rounded-full"></span>
                 Pull Requests
               </h2>
@@ -176,10 +173,17 @@ export default function Dashboard({ owner, repo, token, onReset }: DashboardProp
             </div>
             <div className="space-y-4">
               <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+                <span className="w-1 h-6 bg-gradient-to-b from-green-500 to-emerald-600 rounded-full"></span>
+                Runners
+              </h2>
+              <RunnerList runners={runners} jobs={jobs} runs={runs} />
+            </div>
+            <div className="space-y-4">
+              <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
                 <span className="w-1 h-6 bg-gradient-to-b from-purple-500 to-pink-600 rounded-full"></span>
                 Workflow Runs
               </h2>
-              <WorkflowRunList runs={runs} />
+              <WorkflowRunList runs={runs} jobs={jobs} />
             </div>
           </div>
         )}

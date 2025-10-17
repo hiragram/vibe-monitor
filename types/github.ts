@@ -25,12 +25,17 @@ export interface GitHubPullRequest {
     name: string;
     color: string;
   }>;
+  additions: number;
+  deletions: number;
+  changed_files: number;
+  check_status?: "success" | "pending" | "failure";
 }
 
 export interface GitHubWorkflowRun {
   id: number;
   name: string;
   display_title: string;
+  run_number: number;
   status: "queued" | "in_progress" | "completed";
   conclusion: "success" | "failure" | "cancelled" | "skipped" | null;
   html_url: string;
@@ -55,6 +60,21 @@ export interface GitHubRunner {
     name: string;
     type: string;
   }>;
+}
+
+export interface GitHubJob {
+  id: number;
+  run_id: number;
+  run_attempt: number;
+  name: string;
+  status: "queued" | "in_progress" | "completed";
+  conclusion: "success" | "failure" | "cancelled" | "skipped" | null;
+  started_at: string | null;
+  completed_at: string | null;
+  html_url: string;
+  runner_id: number | null;
+  runner_name: string | null;
+  labels: string[];
 }
 
 export interface GitHubConfig {
