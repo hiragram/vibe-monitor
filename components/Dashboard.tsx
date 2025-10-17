@@ -22,7 +22,7 @@ export default function Dashboard({ owner, repo, token, onReset }: DashboardProp
   const [jobs, setJobs] = useState<GitHubJob[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [pollingInterval, setPollingInterval] = useState(30000); // 30 seconds default
+  const [pollingInterval, setPollingInterval] = useState<number | null>(30000); // 30 seconds default
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
   const fetchData = async () => {
@@ -36,7 +36,9 @@ export default function Dashboard({ owner, repo, token, onReset }: DashboardProp
       ]);
 
       if (!pullsRes.ok || !runsRes.ok || !runnersRes.ok || !jobsRes.ok) {
-        throw new Error("Failed to fetch data");
+        const errorResponse = !pullsRes.ok ? pullsRes : !runsRes.ok ? runsRes : !runnersRes.ok ? runnersRes : jobsRes;
+        const errorText = await errorResponse.text();
+        throw new Error(`Failed to fetch data (${errorResponse.status}): ${errorText}`);
       }
 
       const [pullsData, runsData, runnersData, jobsData] = await Promise.all([
@@ -52,7 +54,10 @@ export default function Dashboard({ owner, repo, token, onReset }: DashboardProp
       setJobs(jobsData);
       setLastUpdated(new Date());
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
+      const errorMessage = err instanceof Error ? err.message : "An error occurred";
+      setError(errorMessage);
+      // Stop polling on error
+      setPollingInterval(null);
     } finally {
       setLoading(false);
     }
@@ -60,6 +65,12 @@ export default function Dashboard({ owner, repo, token, onReset }: DashboardProp
 
   useEffect(() => {
     fetchData();
+
+    // Only set up polling if interval is not null (disabled)
+    if (pollingInterval === null) {
+      return;
+    }
+
     const interval = setInterval(fetchData, pollingInterval);
     return () => clearInterval(interval);
   }, [pollingInterval, owner, repo, token]);
@@ -83,8 +94,9 @@ export default function Dashboard({ owner, repo, token, onReset }: DashboardProp
               </p>
               {lastUpdated && (
                 <p className="text-sm text-slate-500 dark:text-slate-500 mt-1 flex items-center gap-2">
-                  <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                  <span className={`w-2 h-2 rounded-full ${pollingInterval !== null ? 'bg-green-500 animate-pulse' : 'bg-slate-400'}`}></span>
                   Last updated: {lastUpdated.toLocaleTimeString()}
+                  {pollingInterval === null && <span className="text-orange-600 dark:text-orange-400 font-medium">(Polling disabled)</span>}
                 </p>
               )}
             </div>
@@ -154,6 +166,9 @@ export default function Dashboard({ owner, repo, token, onReset }: DashboardProp
         {error && (
           <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 rounded-lg shadow-sm">
             <p className="text-red-800 dark:text-red-300 font-medium">Error: {error}</p>
+            <p className="text-red-700 dark:text-red-400 text-sm mt-2">
+              Polling has been automatically disabled. Please check your GitHub token and rate limits, then re-enable polling from the dropdown above.
+            </p>
           </div>
         )}
 

@@ -33,6 +33,11 @@ function getStatusLabel(status: string, conclusion: string | null) {
 }
 
 export default function WorkflowRunList({ runs, jobs }: WorkflowRunListProps) {
+  const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, url: string) => {
+    e.preventDefault();
+    window.open(url, '_blank');
+  };
+
   // Filter runs to show only queued and in_progress
   const activeRuns = runs.filter((run) => run.status === "queued" || run.status === "in_progress");
 
@@ -66,6 +71,7 @@ export default function WorkflowRunList({ runs, jobs }: WorkflowRunListProps) {
             href={run.html_url}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={(e) => handleLinkClick(e, run.html_url)}
             className="block p-4 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-xl hover:shadow-lg transition-all duration-200 border border-slate-200/50 dark:border-slate-700/50 hover:border-purple-400 dark:hover:border-purple-500 group"
           >
             <div className="flex items-start justify-between gap-3 mb-3">

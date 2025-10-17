@@ -29,8 +29,14 @@ export class GitHubApiClient {
     });
 
     if (!response.ok) {
+      const errorBody = await response.text();
+      console.error(`GitHub API error for ${path}:`, {
+        status: response.status,
+        statusText: response.statusText,
+        body: errorBody,
+      });
       throw new Error(
-        `GitHub API error: ${response.status} ${response.statusText}`
+        `GitHub API error: ${response.status} ${response.statusText} - ${errorBody}`
       );
     }
 
@@ -42,63 +48,31 @@ export class GitHubApiClient {
       `/repos/${this.owner}/${this.repo}/pulls?state=open&sort=updated&direction=desc`
     );
 
-    // Fetch detailed info for each PR to get additions, deletions, changed_files, and check status
-    const detailedPulls = await Promise.all(
-      pulls.map(async (pr) => {
-        try {
-          const detailed = await this.fetch<GitHubPullRequest>(
-            `/repos/${this.owner}/${this.repo}/pulls/${pr.number}`
-          );
-
-          // Fetch check runs status
-          let checkStatus: "success" | "pending" | "failure" | undefined;
-          try {
-            const checkRuns = await this.fetch<{
-              total_count: number;
-              check_runs: Array<{
-                status: string;
-                conclusion: string | null;
-              }>;
-            }>(`/repos/${this.owner}/${this.repo}/commits/${pr.head.sha}/check-runs`);
-
-            if (checkRuns.total_count === 0) {
-              checkStatus = undefined;
-            } else {
-              const hasInProgress = checkRuns.check_runs.some(
-                (run) => run.status !== "completed"
-              );
-              const hasFailed = checkRuns.check_runs.some(
-                (run) => run.conclusion === "failure" || run.conclusion === "cancelled"
-              );
-
-              if (hasInProgress) {
-                checkStatus = "pending";
-              } else if (hasFailed) {
-                checkStatus = "failure";
-              } else {
-                checkStatus = "success";
-              }
-            }
-          } catch (error) {
-            console.error(`Failed to fetch check runs for PR #${pr.number}:`, error);
-          }
-
-          return { ...detailed, check_status: checkStatus };
-        } catch (error) {
-          console.error(`Failed to fetch details for PR #${pr.number}:`, error);
-          return pr; // Return basic PR info if detailed fetch fails
-        }
-      })
-    );
-
-    return detailedPulls;
+    return pulls;
   }
 
   async getWorkflowRuns(): Promise<GitHubWorkflowRun[]> {
-    const data = await this.fetch<{ workflow_runs: GitHubWorkflowRun[] }>(
-      `/repos/${this.owner}/${this.repo}/actions/runs?per_page=20`
+    // Fetch only in_progress and queued runs
+    const [inProgressData, queuedData] = await Promise.all([
+      this.fetch<{ workflow_runs: GitHubWorkflowRun[] }>(
+        `/repos/${this.owner}/${this.repo}/actions/runs?status=in_progress&per_page=50`
+      ),
+      this.fetch<{ workflow_runs: GitHubWorkflowRun[] }>(
+        `/repos/${this.owner}/${this.repo}/actions/runs?status=queued&per_page=50`
+      ),
+    ]);
+
+    // Combine and deduplicate by run_id
+    const allRuns = [
+      ...inProgressData.workflow_runs,
+      ...queuedData.workflow_runs,
+    ];
+
+    const uniqueRuns = Array.from(
+      new Map(allRuns.map(run => [run.id, run])).values()
     );
-    return data.workflow_runs;
+
+    return uniqueRuns;
   }
 
   async getRunners(): Promise<GitHubRunner[]> {

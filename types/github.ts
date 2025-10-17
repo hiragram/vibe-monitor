@@ -20,15 +20,10 @@ export interface GitHubPullRequest {
   base: {
     ref: string;
   };
-  mergeable_state?: string;
   labels: Array<{
     name: string;
     color: string;
   }>;
-  additions: number;
-  deletions: number;
-  changed_files: number;
-  check_status?: "success" | "pending" | "failure";
 }
 
 export interface GitHubWorkflowRun {
