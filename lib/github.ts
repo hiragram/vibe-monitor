@@ -1,4 +1,4 @@
-import { GitHubPullRequest, GitHubWorkflowRun } from "@/types/github";
+import { GitHubPullRequest, GitHubWorkflowRun, GitHubRunner } from "@/types/github";
 
 interface GitHubApiOptions {
   owner: string;
@@ -48,5 +48,12 @@ export class GitHubApiClient {
       `/repos/${this.owner}/${this.repo}/actions/runs?per_page=20`
     );
     return data.workflow_runs;
+  }
+
+  async getRunners(): Promise<GitHubRunner[]> {
+    const data = await this.fetch<{ runners: GitHubRunner[] }>(
+      `/repos/${this.owner}/${this.repo}/actions/runners`
+    );
+    return data.runners;
   }
 }

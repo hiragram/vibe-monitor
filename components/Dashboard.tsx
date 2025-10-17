@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { GitHubPullRequest, GitHubWorkflowRun } from "@/types/github";
+import { GitHubPullRequest, GitHubWorkflowRun, GitHubRunner } from "@/types/github";
 import PullRequestList from "./PullRequestList";
 import WorkflowRunList from "./WorkflowRunList";
+import RunnerList from "./RunnerList";
 import PollingControl from "./PollingControl";
 
 interface DashboardProps {
@@ -16,6 +17,7 @@ interface DashboardProps {
 export default function Dashboard({ owner, repo, token, onReset }: DashboardProps) {
   const [pulls, setPulls] = useState<GitHubPullRequest[]>([]);
   const [runs, setRuns] = useState<GitHubWorkflowRun[]>([]);
+  const [runners, setRunners] = useState<GitHubRunner[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [pollingInterval, setPollingInterval] = useState(30000); // 30 seconds default
@@ -24,22 +26,25 @@ export default function Dashboard({ owner, repo, token, onReset }: DashboardProp
   const fetchData = async () => {
     try {
       setError(null);
-      const [pullsRes, runsRes] = await Promise.all([
+      const [pullsRes, runsRes, runnersRes] = await Promise.all([
         fetch(`/api/github/pulls?owner=${owner}&repo=${repo}&token=${token}`),
         fetch(`/api/github/actions?owner=${owner}&repo=${repo}&token=${token}`),
+        fetch(`/api/github/runners?owner=${owner}&repo=${repo}&token=${token}`),
       ]);
 
-      if (!pullsRes.ok || !runsRes.ok) {
+      if (!pullsRes.ok || !runsRes.ok || !runnersRes.ok) {
         throw new Error("Failed to fetch data");
       }
 
-      const [pullsData, runsData] = await Promise.all([
+      const [pullsData, runsData, runnersData] = await Promise.all([
         pullsRes.json(),
         runsRes.json(),
+        runnersRes.json(),
       ]);
 
       setPulls(pullsData);
       setRuns(runsData);
+      setRunners(runnersData);
       setLastUpdated(new Date());
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
@@ -94,14 +99,20 @@ export default function Dashboard({ owner, repo, token, onReset }: DashboardProp
             <p className="text-gray-600 dark:text-gray-400">Loading...</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <div>
-              <h2 className="text-2xl font-bold mb-4">Pull Requests</h2>
-              <PullRequestList pulls={pulls} />
-            </div>
-            <div>
-              <h2 className="text-2xl font-bold mb-4">Workflow Runs</h2>
-              <WorkflowRunList runs={runs} />
+          <div className="space-y-8">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              <div>
+                <h2 className="text-2xl font-bold mb-4">Runners</h2>
+                <RunnerList runners={runners} />
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold mb-4">Pull Requests</h2>
+                <PullRequestList pulls={pulls} />
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold mb-4">Workflow Runs</h2>
+                <WorkflowRunList runs={runs} />
+              </div>
             </div>
           </div>
         )}

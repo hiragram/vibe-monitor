@@ -44,6 +44,19 @@ export interface GitHubWorkflowRun {
   path: string;
 }
 
+export interface GitHubRunner {
+  id: number;
+  name: string;
+  os: string;
+  status: "online" | "offline";
+  busy: boolean;
+  labels: Array<{
+    id: number;
+    name: string;
+    type: string;
+  }>;
+}
+
 export interface GitHubConfig {
   owner: string;
   repo: string;

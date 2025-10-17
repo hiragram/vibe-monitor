@@ -9,5 +9,18 @@
     ],
     "deny": [],
     "ask": []
+  },
+  "hooks": {
+    "Notification": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "say -v \"Ava (Premium)\" \"Claude is waiting for you\""
+          }
+        ]
+      }
+    ]
   }
 }
