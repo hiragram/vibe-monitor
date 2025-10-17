@@ -1,155 +1,155 @@
 # Vibe Monitor
 
-GitHub リポジトリのアクティビティをリアルタイムで監視するElectronアプリケーションです。
+An Electron application for real-time monitoring of GitHub repository activity.
 
-## 特徴
+## Features
 
-- **リアルタイム監視**: Pull Request、Workflow Run、Runnerの状態を自動更新
-- **ポーリング制御**: 更新間隔の調整や一時停止が可能
-- **Rate Limit対策**: APIリクエストを最適化し、GitHub API rate limitに配慮
-- **ダークモード対応**: ライト/ダークテーマの切り替え
-- **Electronアプリ**: デスクトップアプリケーションとして動作
+- **Real-time Monitoring**: Auto-updates for Pull Requests, Workflow Runs, and Runners
+- **Polling Control**: Adjustable update intervals with pause capability
+- **Rate Limit Friendly**: Optimized API requests to respect GitHub API rate limits
+- **Dark Mode**: Toggle between light and dark themes
+- **Desktop App**: Runs as a native Electron application
 
-## セットアップ
+## Setup
 
-### 必要なもの
+### Requirements
 
-- Node.js 18以上
-- npm または yarn
+- Node.js 18 or higher
+- npm or yarn
 - GitHub Personal Access Token
 
-### インストール
+### Installation
 
 ```bash
-# 依存関係のインストール
+# Install dependencies
 npm install
 ```
 
-### GitHub Personal Access Token の取得
+### Getting a GitHub Personal Access Token
 
-1. [GitHub Settings > Personal Access Tokens](https://github.com/settings/tokens/new) にアクセス
-2. 以下のスコープを付与:
-   - `repo` (リポジトリへのフルアクセス)
-   - `workflow` (GitHub Actionsへのアクセス)
-3. トークンを生成してコピー
+1. Go to [GitHub Settings > Personal Access Tokens](https://github.com/settings/tokens/new)
+2. Grant the following scopes:
+   - `repo` (Full control of private repositories)
+   - `workflow` (Update GitHub Action workflows)
+3. Generate and copy the token
 
-## 使い方
+## Usage
 
-### 開発モード（Electronアプリ）
+### Development Mode (Electron App)
 
 ```bash
 npm run electron:dev
 ```
 
-このコマンドで以下が実行されます:
-- Next.js開発サーバーの起動 (localhost:3000)
-- Electronアプリの起動
+This command will:
+- Start the Next.js development server (localhost:3000)
+- Launch the Electron app
 
-### Webブラウザで開発
+### Web Browser Development
 
 ```bash
 npm run dev
 ```
 
-ブラウザで http://localhost:3000 を開きます。
+Open http://localhost:3000 in your browser.
 
-### 本番ビルド（Electronアプリ）
+### Production Build (Electron App)
 
 ```bash
-# macOS用のビルド
+# Build for macOS
 npm run electron:build:mac
 
-# または汎用ビルド
+# Or generic build
 npm run electron:build
 ```
 
-ビルドされたアプリは `dist/` ディレクトリに生成されます。
+The built app will be generated in the `dist/` directory.
 
-## 設定
+## Configuration
 
-アプリを起動すると、以下の情報を入力する画面が表示されます:
+When you launch the app, you'll be prompted to enter:
 
-1. **Repository Owner**: GitHubのユーザー名または組織名
-2. **Repository Name**: 監視したいリポジトリ名
-3. **GitHub Token**: 取得したPersonal Access Token
+1. **Repository Owner**: GitHub username or organization name
+2. **Repository Name**: Name of the repository to monitor
+3. **GitHub Token**: Your Personal Access Token
 
-## 機能
+## Features
 
-### ポーリング制御
+### Polling Control
 
-右上のドロップダウンから更新間隔を変更できます:
-- **Disabled**: ポーリングを停止（手動更新のみ）
-- **10s**: 10秒ごとに更新
-- **30s**: 30秒ごとに更新（デフォルト）
-- **1m**: 1分ごとに更新
+Change update intervals from the dropdown in the top right:
+- **Disabled**: Stop polling (manual updates only)
+- **10s**: Update every 10 seconds
+- **30s**: Update every 30 seconds (default)
+- **1m**: Update every minute
 
-### エラーハンドリング
+### Error Handling
 
-- GitHub APIからエラーが返された場合、自動的にポーリングが停止されます
-- エラーメッセージでrate limitなどの問題を確認できます
-- ポーリングを再開するには、ドロップダウンから間隔を選択してください
+- Polling automatically stops when GitHub API returns an error
+- Error messages show details about rate limits and other issues
+- Resume polling by selecting an interval from the dropdown
 
 ### API Rate Limit
 
-GitHub APIのrate limitは以下の通りです:
-- Personal Access Token: **5,000リクエスト/時**
+GitHub API rate limits:
+- Personal Access Token: **5,000 requests/hour**
 
-このアプリは1回のポーリングで約12-15リクエストを使用します:
-- 30秒間隔: 約1,800リクエスト/時（36%使用）
-- 10秒間隔: 約5,400リクエスト/時（**rate limit超過の可能性あり**）
+This app uses approximately 12-15 requests per poll:
+- 30 second interval: ~1,800 requests/hour (36% usage)
+- 10 second interval: ~5,400 requests/hour (**may exceed rate limit**)
 
-推奨設定: **30秒以上の間隔**
+Recommended: **30 seconds or longer intervals**
 
-## 技術スタック
+## Tech Stack
 
-- **Next.js 15**: Reactフレームワーク
-- **TypeScript**: 型安全性
-- **Tailwind CSS**: スタイリング
-- **Electron**: デスクトップアプリケーション
-- **GitHub REST API**: データ取得
+- **Next.js 15**: React framework
+- **TypeScript**: Type safety
+- **Tailwind CSS**: Styling
+- **Electron**: Desktop application
+- **GitHub REST API**: Data fetching
 
-## プロジェクト構成
+## Project Structure
 
 ```
 vibe-monitor/
-├── app/                    # Next.jsのAppルーター
-├── components/             # Reactコンポーネント
-├── lib/                    # GitHub APIクライアント
-├── types/                  # TypeScript型定義
-├── electron/               # Electronメインプロセス
+├── app/                    # Next.js App Router
+├── components/             # React components
+├── lib/                    # GitHub API client
+├── types/                  # TypeScript type definitions
+├── electron/               # Electron main process
 │   └── main.js
-└── public/                 # 静的ファイル
+└── public/                 # Static files
 ```
 
-## トラブルシューティング
+## Troubleshooting
 
-### Rate Limitエラー
+### Rate Limit Error
 
-エラーメッセージ: `Failed to fetch data (403)`
+Error message: `Failed to fetch data (403)`
 
-**対処法**:
-1. ポーリング間隔を長くする（1分など）
-2. 一時的にポーリングを無効化
-3. 1時間待ってrate limitがリセットされるのを待つ
+**Solutions**:
+1. Increase polling interval (e.g., 1 minute)
+2. Temporarily disable polling
+3. Wait up to 1 hour for rate limit to reset
 
-### Electronアプリが起動しない
+### Electron App Won't Start
 
-**対処法**:
-1. Next.jsサーバーが起動しているか確認
-2. ポート3000が使用可能か確認
-3. `npm run electron:dev` を再実行
+**Solutions**:
+1. Verify Next.js server is running
+2. Check that port 3000 is available
+3. Re-run `npm run electron:dev`
 
-### データが表示されない
+### No Data Displayed
 
-**対処法**:
-1. GitHub Tokenが正しいか確認
-2. Tokenに必要なスコープ（`repo`, `workflow`）が付与されているか確認
-3. リポジトリ名とオーナー名が正しいか確認
+**Solutions**:
+1. Verify GitHub Token is correct
+2. Ensure token has required scopes (`repo`, `workflow`)
+3. Check repository owner and name are correct
 
-## ライセンス
+## License
 
 MIT
 
-## 貢献
+## Contributing
 
-Issue、Pull Requestを歓迎します！
+Issues and Pull Requests are welcome!
