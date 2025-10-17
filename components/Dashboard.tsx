@@ -6,6 +6,7 @@ import PullRequestList from "./PullRequestList";
 import WorkflowRunList from "./WorkflowRunList";
 import RunnerList from "./RunnerList";
 import PollingControl from "./PollingControl";
+import ThemeToggle from "./ThemeToggle";
 
 interface DashboardProps {
   owner: string;
@@ -84,6 +85,7 @@ export default function Dashboard({ owner, repo, token, onReset }: DashboardProp
               )}
             </div>
             <div className="flex gap-3 items-center">
+              <ThemeToggle />
               <PollingControl
                 interval={pollingInterval}
                 onChange={setPollingInterval}
