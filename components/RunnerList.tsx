@@ -56,9 +56,9 @@ export default function RunnerList({ runners }: RunnerListProps) {
           </div>
           {runner.labels.length > 0 && (
             <div className="flex flex-wrap gap-1 mt-2">
-              {runner.labels.map((label) => (
+              {runner.labels.map((label, index) => (
                 <span
-                  key={label.id}
+                  key={`${runner.id}-${label.id}-${index}`}
                   className="px-2 py-0.5 text-xs bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded"
                 >
                   {label.name}
