@@ -59,60 +59,125 @@ export default function Dashboard({ owner, repo, token, onReset }: DashboardProp
     return () => clearInterval(interval);
   }, [pollingInterval, owner, repo, token]);
 
+  const onlineRunners = runners.filter((r) => r.status === "online").length;
+  const busyRunners = runners.filter((r) => r.busy).length;
+  const inProgressRuns = runs.filter((r) => r.status === "in_progress").length;
+
   return (
-    <div className="min-h-screen p-8">
+    <div className="min-h-screen p-6 md:p-8 bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-900">
       <div className="max-w-7xl mx-auto">
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold mb-2">Vibe Monitor</h1>
-            <p className="text-gray-600 dark:text-gray-400">
-              Monitoring: <span className="font-mono">{owner}/{repo}</span>
-            </p>
-            {lastUpdated && (
-              <p className="text-sm text-gray-500 dark:text-gray-500 mt-1">
-                Last updated: {lastUpdated.toLocaleTimeString()}
+        {/* Header */}
+        <div className="mb-8">
+          <div className="flex items-start justify-between mb-6">
+            <div>
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
+                Vibe Monitor
+              </h1>
+              <p className="text-slate-600 dark:text-slate-400 text-lg">
+                Monitoring: <span className="font-mono font-semibold text-slate-900 dark:text-slate-100">{owner}/{repo}</span>
               </p>
-            )}
+              {lastUpdated && (
+                <p className="text-sm text-slate-500 dark:text-slate-500 mt-1 flex items-center gap-2">
+                  <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                  Last updated: {lastUpdated.toLocaleTimeString()}
+                </p>
+              )}
+            </div>
+            <div className="flex gap-3 items-center">
+              <PollingControl
+                interval={pollingInterval}
+                onChange={setPollingInterval}
+              />
+              <button
+                onClick={onReset}
+                className="px-4 py-2 text-sm font-medium bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-all shadow-sm hover:shadow-md border border-slate-200 dark:border-slate-700"
+              >
+                Change Repository
+              </button>
+            </div>
           </div>
-          <div className="flex gap-4 items-center">
-            <PollingControl
-              interval={pollingInterval}
-              onChange={setPollingInterval}
-            />
-            <button
-              onClick={onReset}
-              className="px-4 py-2 text-sm bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 rounded-lg transition-colors"
-            >
-              Change Repository
-            </button>
+
+          {/* Stats Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+            <div className="bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl p-6 shadow-lg text-white">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-green-100 text-sm font-medium mb-1">Runners Online</p>
+                  <p className="text-4xl font-bold">{onlineRunners}</p>
+                  <p className="text-green-100 text-xs mt-1">{busyRunners} busy</p>
+                </div>
+                <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M12 5l7 7-7 7" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl p-6 shadow-lg text-white">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-blue-100 text-sm font-medium mb-1">Open Pull Requests</p>
+                  <p className="text-4xl font-bold">{pulls.length}</p>
+                </div>
+                <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl p-6 shadow-lg text-white">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-purple-100 text-sm font-medium mb-1">Active Workflows</p>
+                  <p className="text-4xl font-bold">{inProgressRuns}</p>
+                  <p className="text-purple-100 text-xs mt-1">{runs.length} total</p>
+                </div>
+                <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
         {error && (
-          <div className="mb-6 p-4 bg-red-100 dark:bg-red-900 border border-red-400 dark:border-red-700 rounded-lg">
-            <p className="text-red-800 dark:text-red-200">Error: {error}</p>
+          <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 rounded-lg shadow-sm">
+            <p className="text-red-800 dark:text-red-300 font-medium">Error: {error}</p>
           </div>
         )}
 
         {loading ? (
-          <div className="text-center py-12">
-            <p className="text-gray-600 dark:text-gray-400">Loading...</p>
+          <div className="text-center py-20">
+            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+            <p className="text-slate-600 dark:text-slate-400 mt-4">Loading...</p>
           </div>
         ) : (
-          <div className="space-y-8">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              <div>
-                <h2 className="text-2xl font-bold mb-4">Runners</h2>
-                <RunnerList runners={runners} />
-              </div>
-              <div>
-                <h2 className="text-2xl font-bold mb-4">Pull Requests</h2>
-                <PullRequestList pulls={pulls} />
-              </div>
-              <div>
-                <h2 className="text-2xl font-bold mb-4">Workflow Runs</h2>
-                <WorkflowRunList runs={runs} />
-              </div>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="space-y-4">
+              <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+                <span className="w-1 h-6 bg-gradient-to-b from-green-500 to-emerald-600 rounded-full"></span>
+                Runners
+              </h2>
+              <RunnerList runners={runners} />
+            </div>
+            <div className="space-y-4">
+              <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+                <span className="w-1 h-6 bg-gradient-to-b from-blue-500 to-indigo-600 rounded-full"></span>
+                Pull Requests
+              </h2>
+              <PullRequestList pulls={pulls} />
+            </div>
+            <div className="space-y-4">
+              <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+                <span className="w-1 h-6 bg-gradient-to-b from-purple-500 to-pink-600 rounded-full"></span>
+                Workflow Runs
+              </h2>
+              <WorkflowRunList runs={runs} />
             </div>
           </div>
         )}
