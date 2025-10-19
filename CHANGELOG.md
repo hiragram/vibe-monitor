@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.2.8](https://github.com/hiragram/vibe-monitor/compare/v0.2.7...v0.2.8) (2025-10-19)
+
+
+### Bug Fixes
+
+* Enable static export for Electron app with direct GitHub API calls ([6c5f3dd](https://github.com/hiragram/vibe-monitor/commit/6c5f3dd3a6641543180fb47a22f3aae2a0ed6f22))
+* Include electron-store in packaged app ([338893e](https://github.com/hiragram/vibe-monitor/commit/338893e60768e381aa79dbbf35764e72622fe42c))
+
 ## [0.2.7](https://github.com/hiragram/vibe-monitor/compare/v0.2.6...v0.2.7) (2025-10-19)
 
 
