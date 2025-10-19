@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.9](https://github.com/hiragram/vibe-monitor/compare/v0.2.8...v0.2.9) (2025-10-19)
+
+
+### Performance Improvements
+
+* Build Apple Silicon only to reduce app size ([099a66a](https://github.com/hiragram/vibe-monitor/commit/099a66a81db6b1414004d3974333908c7549b5c7))
+
 ## [0.2.8](https://github.com/hiragram/vibe-monitor/compare/v0.2.7...v0.2.8) (2025-10-19)
 
 
