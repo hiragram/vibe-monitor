@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.6](https://github.com/hiragram/vibe-monitor/compare/v0.2.5...v0.2.6) (2025-10-19)
+
+
+### Bug Fixes
+
+* Move build dependencies to devDependencies to reduce app size ([2a010ef](https://github.com/hiragram/vibe-monitor/commit/2a010efde4900c4383a01467ed2a65965fcbe3dc))
+
 ## [0.2.5](https://github.com/hiragram/vibe-monitor/compare/v0.2.4...v0.2.5) (2025-10-19)
 
 
