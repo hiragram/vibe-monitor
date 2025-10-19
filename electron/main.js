@@ -41,8 +41,10 @@ function createWindow() {
     trafficLightPosition: { x: 12, y: 12 },
   });
 
-  // In development, wait for Next.js dev server
-  const isDev = process.env.NODE_ENV !== 'production';
+  // Check if running in development mode
+  // In packaged app, use app.isPackaged
+  // In development, check NODE_ENV or if dev server is expected
+  const isDev = !app.isPackaged && process.env.NODE_ENV !== 'production';
 
   if (isDev) {
     // Load from Next.js dev server

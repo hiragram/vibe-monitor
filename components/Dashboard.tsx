@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { GitHubPullRequest, GitHubWorkflowRun, GitHubRunner, GitHubJob } from "@/types/github";
+import { GitHubApiClient } from "@/lib/github";
 import PullRequestList from "./PullRequestList";
 import WorkflowRunList from "./WorkflowRunList";
 import RunnerList from "./RunnerList";
@@ -28,24 +29,13 @@ export default function Dashboard({ owner, repo, token, onReset }: DashboardProp
   const fetchData = async () => {
     try {
       setError(null);
-      const [pullsRes, runsRes, runnersRes, jobsRes] = await Promise.all([
-        fetch(`/api/github/pulls?owner=${owner}&repo=${repo}&token=${token}`),
-        fetch(`/api/github/actions?owner=${owner}&repo=${repo}&token=${token}`),
-        fetch(`/api/github/runners?owner=${owner}&repo=${repo}&token=${token}`),
-        fetch(`/api/github/jobs?owner=${owner}&repo=${repo}&token=${token}`),
-      ]);
-
-      if (!pullsRes.ok || !runsRes.ok || !runnersRes.ok || !jobsRes.ok) {
-        const errorResponse = !pullsRes.ok ? pullsRes : !runsRes.ok ? runsRes : !runnersRes.ok ? runnersRes : jobsRes;
-        const errorText = await errorResponse.text();
-        throw new Error(`Failed to fetch data (${errorResponse.status}): ${errorText}`);
-      }
+      const client = new GitHubApiClient({ owner, repo, token });
 
       const [pullsData, runsData, runnersData, jobsData] = await Promise.all([
-        pullsRes.json(),
-        runsRes.json(),
-        runnersRes.json(),
-        jobsRes.json(),
+        client.getPullRequests(),
+        client.getWorkflowRuns(),
+        client.getRunners(),
+        client.getJobs(),
       ]);
 
       setPulls(pullsData);
