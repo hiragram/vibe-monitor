@@ -41,7 +41,9 @@
     "files": [
       "electron/**/*",
       "out/**/*",
-      "package.json"
+      "package.json",
+      "!.next",
+      "!node_modules"
     ],
     "directories": {
       "buildResources": "assets",
