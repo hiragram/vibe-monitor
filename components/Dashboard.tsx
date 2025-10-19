@@ -80,39 +80,46 @@ export default function Dashboard({ owner, repo, token, onReset }: DashboardProp
   const queuedRuns = runs.filter((r) => r.status === "queued").length;
 
   return (
-    <div className="min-h-screen p-6 md:p-8 bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-900">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-start justify-between mb-6">
-            <div>
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
-                Vibe Monitor
-              </h1>
-              <p className="text-slate-600 dark:text-slate-400 text-lg">
-                Monitoring: <span className="font-mono font-semibold text-slate-900 dark:text-slate-100">{owner}/{repo}</span>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-900">
+      {/* Draggable Title Bar */}
+      <div className="drag-region fixed top-0 left-0 right-0 h-12 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200/50 dark:border-slate-700/50 z-50 flex items-center justify-between px-4">
+        <div className="flex items-center gap-3">
+          {/* Space for macOS traffic lights */}
+          <div className="w-16"></div>
+          <h1 className="text-sm font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent select-none">
+            Vibe Monitor
+          </h1>
+          <span className="text-xs text-slate-500 dark:text-slate-400 font-mono select-none">
+            {owner}/{repo}
+          </span>
+        </div>
+        <div className="no-drag flex gap-2 items-center">
+          <ThemeToggle />
+          <PollingControl
+            interval={pollingInterval}
+            onChange={setPollingInterval}
+          />
+          <button
+            onClick={onReset}
+            className="px-3 py-1 text-xs font-medium bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-md transition-all shadow-sm hover:shadow-md border border-slate-200 dark:border-slate-700"
+          >
+            Change Repository
+          </button>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="pt-16 p-6 md:p-8">
+        <div className="max-w-7xl mx-auto">
+          {/* Status Info */}
+          <div className="mb-8">
+            {lastUpdated && (
+              <p className="text-sm text-slate-500 dark:text-slate-500 flex items-center gap-2">
+                <span className={`w-2 h-2 rounded-full ${pollingInterval !== null ? 'bg-green-500 animate-pulse' : 'bg-slate-400'}`}></span>
+                Last updated: {lastUpdated.toLocaleTimeString()}
+                {pollingInterval === null && <span className="text-orange-600 dark:text-orange-400 font-medium">(Polling disabled)</span>}
               </p>
-              {lastUpdated && (
-                <p className="text-sm text-slate-500 dark:text-slate-500 mt-1 flex items-center gap-2">
-                  <span className={`w-2 h-2 rounded-full ${pollingInterval !== null ? 'bg-green-500 animate-pulse' : 'bg-slate-400'}`}></span>
-                  Last updated: {lastUpdated.toLocaleTimeString()}
-                  {pollingInterval === null && <span className="text-orange-600 dark:text-orange-400 font-medium">(Polling disabled)</span>}
-                </p>
-              )}
-            </div>
-            <div className="flex gap-3 items-center">
-              <ThemeToggle />
-              <PollingControl
-                interval={pollingInterval}
-                onChange={setPollingInterval}
-              />
-              <button
-                onClick={onReset}
-                className="px-4 py-2 text-sm font-medium bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-all shadow-sm hover:shadow-md border border-slate-200 dark:border-slate-700"
-              >
-                Change Repository
-              </button>
-            </div>
+            )}
           </div>
 
           {/* Stats Cards */}
@@ -149,7 +156,7 @@ export default function Dashboard({ owner, repo, token, onReset }: DashboardProp
             <div className="bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl p-6 shadow-lg text-white">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-purple-100 text-sm font-medium mb-1">Queued Jobs</p>
+                  <p className="text-purple-100 text-sm font-medium mb-1">Pending Jobs</p>
                   <p className="text-4xl font-bold">{queuedRuns}</p>
                   <p className="text-purple-100 text-xs mt-1">{runs.length} total</p>
                 </div>

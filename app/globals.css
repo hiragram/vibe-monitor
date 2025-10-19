@@ -34,4 +34,15 @@ body {
   .gradient-border {
     border-image: linear-gradient(to right, #3b82f6, #8b5cf6) 1;
   }
+
+  /* Electron draggable regions */
+  .drag-region {
+    -webkit-app-region: drag;
+    app-region: drag;
+  }
+
+  .no-drag {
+    -webkit-app-region: no-drag;
+    app-region: no-drag;
+  }
 }

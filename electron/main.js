@@ -1,8 +1,30 @@
-const { app, BrowserWindow, shell } = require('electron');
+const { app, BrowserWindow, shell, ipcMain } = require('electron');
 const path = require('path');
+const Store = require('electron-store').default;
+
+// Initialize electron-store with encryption
+const store = new Store({
+  name: 'config',
+  encryptionKey: 'vibe-monitor-secure-key-2024',
+});
 
 let mainWindow;
 let nextDevReady = false;
+
+// IPC handlers for config management
+ipcMain.handle('config:save', async (event, config) => {
+  store.set('github-config', config);
+  return { success: true };
+});
+
+ipcMain.handle('config:load', async () => {
+  return store.get('github-config', null);
+});
+
+ipcMain.handle('config:clear', async () => {
+  store.delete('github-config');
+  return { success: true };
+});
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -11,9 +33,12 @@ function createWindow() {
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
+      preload: path.join(__dirname, 'preload.js'),
     },
-    titleBarStyle: 'hiddenInset',
+    titleBarStyle: 'hidden',
+    titleBarOverlay: false,
     backgroundColor: '#f8fafc',
+    trafficLightPosition: { x: 12, y: 12 },
   });
 
   // In development, wait for Next.js dev server

@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ConfigForm from "@/components/ConfigForm";
 import Dashboard from "@/components/Dashboard";
+import { getConfigStorage } from "@/lib/storage";
 
 export default function Home() {
   const [config, setConfig] = useState<{
@@ -10,18 +11,49 @@ export default function Home() {
     repo: string;
     token: string;
   } | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const handleConfigSubmit = (newConfig: {
+  // Load saved config on mount
+  useEffect(() => {
+    const loadConfig = async () => {
+      const storage = getConfigStorage();
+      const savedConfig = await storage.load();
+      if (savedConfig) {
+        setConfig(savedConfig);
+      }
+      setIsLoading(false);
+    };
+    loadConfig();
+  }, []);
+
+  const handleConfigSubmit = async (newConfig: {
     owner: string;
     repo: string;
     token: string;
   }) => {
+    // Save config to storage
+    const storage = getConfigStorage();
+    await storage.save(newConfig);
     setConfig(newConfig);
   };
 
   const handleReset = () => {
     setConfig(null);
   };
+
+  // Show loading state while checking for saved config
+  if (isLoading) {
+    return (
+      <main className="min-h-screen p-8 bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-900">
+        <div className="max-w-4xl mx-auto flex items-center justify-center min-h-[50vh]">
+          <div className="text-center">
+            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+            <p className="text-slate-600 dark:text-slate-400">Loading...</p>
+          </div>
+        </div>
+      </main>
+    );
+  }
 
   if (config) {
     return (
@@ -44,7 +76,7 @@ export default function Home() {
 
         <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm p-6 rounded-lg border border-slate-200 dark:border-slate-700 shadow-lg">
           <h2 className="text-xl font-semibold mb-4 text-slate-900 dark:text-slate-100">Configure Repository</h2>
-          <ConfigForm onSubmit={handleConfigSubmit} />
+          <ConfigForm onSubmit={handleConfigSubmit} initialConfig={config} />
         </div>
 
         <div className="mt-8 p-4 bg-blue-50/80 dark:bg-blue-900/20 backdrop-blur-sm border border-blue-200 dark:border-blue-800 rounded-lg shadow-sm">

@@ -1,15 +1,31 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { getConfigStorage } from "@/lib/storage";
 
 interface ConfigFormProps {
   onSubmit: (config: { owner: string; repo: string; token: string }) => void;
+  initialConfig?: { owner: string; repo: string; token: string } | null;
 }
 
-export default function ConfigForm({ onSubmit }: ConfigFormProps) {
+export default function ConfigForm({ onSubmit, initialConfig }: ConfigFormProps) {
   const [owner, setOwner] = useState("");
   const [repo, setRepo] = useState("");
   const [token, setToken] = useState("");
+
+  // Load saved config when component mounts or when going back to config screen
+  useEffect(() => {
+    const loadSavedConfig = async () => {
+      const storage = getConfigStorage();
+      const savedConfig = await storage.load();
+      if (savedConfig) {
+        setOwner(savedConfig.owner);
+        setRepo(savedConfig.repo);
+        setToken(savedConfig.token);
+      }
+    };
+    loadSavedConfig();
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
