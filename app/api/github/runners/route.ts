@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { GitHubApiClient } from "@/lib/github";
 
+export const dynamic = "force-static";
+export const revalidate = 0;
+
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
   const owner = searchParams.get("owner");
