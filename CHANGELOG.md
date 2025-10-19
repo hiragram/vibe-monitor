@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.5](https://github.com/hiragram/vibe-monitor/compare/v0.2.4...v0.2.5) (2025-10-19)
+
+
+### Bug Fixes
+
+* Exclude .next and node_modules from packaged app ([3cc045e](https://github.com/hiragram/vibe-monitor/commit/3cc045e0be26957276902848f6801686c5720b8f))
+
 ## [0.2.4](https://github.com/hiragram/vibe-monitor/compare/v0.2.3...v0.2.4) (2025-10-19)
 
 
