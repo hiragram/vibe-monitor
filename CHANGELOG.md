@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.7](https://github.com/hiragram/vibe-monitor/compare/v0.2.6...v0.2.7) (2025-10-19)
+
+
+### Bug Fixes
+
+* Remove duplicate Next.js build step in release workflow ([07203ab](https://github.com/hiragram/vibe-monitor/commit/07203aba98696d21db417bd08e2cb9afb9ed5d2e))
+
 ## [0.2.6](https://github.com/hiragram/vibe-monitor/compare/v0.2.5...v0.2.6) (2025-10-19)
 
 
