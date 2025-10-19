@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.3](https://github.com/hiragram/vibe-monitor/compare/v0.2.2...v0.2.3) (2025-10-19)
+
+
+### Bug Fixes
+
+* Re-add APPLE_TEAM_ID for notarization ([b8e8140](https://github.com/hiragram/vibe-monitor/commit/b8e8140b7bde8dcfb264e93121438a7e8b3b2208))
+
 ## [0.2.2](https://github.com/hiragram/vibe-monitor/compare/v0.2.1...v0.2.2) (2025-10-19)
 
 
