@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.2](https://github.com/hiragram/vibe-monitor/compare/v0.2.1...v0.2.2) (2025-10-19)
+
+
+### Bug Fixes
+
+* Remove APPLE_TEAM_ID requirement for personal accounts ([3a373c2](https://github.com/hiragram/vibe-monitor/commit/3a373c2c472d52dd139dc314dd81cfd73323a5b6))
+
 ## [0.2.1](https://github.com/hiragram/vibe-monitor/compare/v0.2.0...v0.2.1) (2025-10-19)
 
 
