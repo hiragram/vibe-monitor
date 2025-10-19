@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.4](https://github.com/hiragram/vibe-monitor/compare/v0.2.3...v0.2.4) (2025-10-19)
+
+
+### Bug Fixes
+
+* Use correct path for packaged Electron app ([86847df](https://github.com/hiragram/vibe-monitor/commit/86847df4e0539f8f3086c6367c6c484f3f037ff8))
+
 ## [0.2.3](https://github.com/hiragram/vibe-monitor/compare/v0.2.2...v0.2.3) (2025-10-19)
 
 
