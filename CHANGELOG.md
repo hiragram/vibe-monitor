@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.0](https://github.com/hiragram/vibe-monitor/compare/v0.2.9...v0.3.0) (2025-10-19)
+
+
+### Features
+
+* Add custom app icon ([687f298](https://github.com/hiragram/vibe-monitor/commit/687f2981f048ba405ee5901a3210f77a2e22bc62))
+
 ## [0.2.9](https://github.com/hiragram/vibe-monitor/compare/v0.2.8...v0.2.9) (2025-10-19)
 
 
