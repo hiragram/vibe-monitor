@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.1](https://github.com/hiragram/vibe-monitor/compare/v0.2.0...v0.2.1) (2025-10-19)
+
+
+### Bug Fixes
+
+* Add static export configuration to API routes ([18b2060](https://github.com/hiragram/vibe-monitor/commit/18b20609553389433ef4d77d8c666fe5a1cfeb8c))
+
 ## 1.0.0 (2025-10-19)
 
 
