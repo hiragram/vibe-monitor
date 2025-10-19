@@ -51,7 +51,9 @@ function createWindow() {
     mainWindow.webContents.openDevTools();
   } else {
     // In production, load from built Next.js app
-    mainWindow.loadURL(`file://${path.join(__dirname, '../out/index.html')}`);
+    // Use app.getAppPath() to get the correct path in packaged app
+    const indexPath = path.join(app.getAppPath(), 'out', 'index.html');
+    mainWindow.loadFile(indexPath);
   }
 
   // Open external links in the default browser
